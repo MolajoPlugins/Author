@@ -1,12 +1,12 @@
 <?php
 /**
- * Article Plugin
+ * Author Plugin
  *
  * @package    Molajo
  * @copyright  2014-2015 Amy Stephen. All rights reserved.
  * @license    http://www.opensource.org/licenses/mit-license.html MIT License
  */
-namespace Molajo\Plugins\Article;
+namespace Molajo\Plugins\Author;
 
 use CommonApi\Event\DisplayEventInterface;
 use CommonApi\Event\ReadEventInterface;
@@ -14,16 +14,16 @@ use Molajo\Plugins\ReadEvent;
 use stdClass;
 
 /**
- * Article Plugin
+ * Author Plugin
  *
  * @package  Molajo
  * @license  http://www.opensource.org/licenses/mit-license.html MIT License
  * @since    1.0
  */
-final class ArticlePlugin extends ReadEvent implements ReadEventInterface, DisplayEventInterface
+final class AuthorPlugin extends ReadEvent implements ReadEventInterface, DisplayEventInterface
 {
     /**
-     * Article Id
+     * Author Id
      *
      * @var    integer
      * @since  1.0.0
@@ -125,7 +125,7 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Get Article Profile
+     * Get Author Profile
      *
      * @return  $this
      * @since   1.0.0
@@ -134,14 +134,14 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     {
         $this->author_id = $this->controller['row']->created_by;
 
-        if ($this->getArticleCache() === true) {
+        if ($this->getAuthorCache() === true) {
         } else {
-            $this->executeArticleQuery();
+            $this->executeAuthorQuery();
         }
 
-        $this->setArticleData();
+        $this->setAuthorData();
 
-        $this->setArticleCache();
+        $this->setAuthorCache();
 
         return $this;
     }
@@ -156,13 +156,13 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     {
         $this->author_id = $this->controller['parameters']->token->attributes['author'];
 
-        if ($this->getArticleCache() === true) {
+        if ($this->getAuthorCache() === true) {
         } else {
-            $this->executeArticleQuery();
-            $this->setArticleCache();
+            $this->executeAuthorQuery();
+            $this->setAuthorCache();
         }
 
-        $cache_key  = $this->getArticleCacheKey();
+        $cache_key  = $this->getAuthorCacheKey();
 
         $this->plugin_data->{strtolower($this->controller['parameters']->token->model_name)}
             = $this->plugin_data->$cache_key;
@@ -171,14 +171,14 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Get Article Cache
+     * Get Author Cache
      *
      * @return  boolean
      * @since   1.0.0
      */
-    protected function getArticleCache()
+    protected function getAuthorCache()
     {
-        $cache_key  = $this->getArticleCacheKey();
+        $cache_key  = $this->getAuthorCacheKey();
 
         if (is_object($this->plugin_data->$cache_key)) {
             return true;
@@ -200,20 +200,20 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Execute Article Query
+     * Execute Author Query
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function executeArticleQuery()
+    protected function executeAuthorQuery()
     {
-        $this->setArticleQuery();
+        $this->setAuthorQuery();
 
         $author_object                 = new stdClass();
         $author_object->data           = $this->runQuery();
         $author_object->model_registry = $this->query->getModelRegistry();
 
-        $key = $this->getArticleCacheKey();
+        $key = $this->getAuthorCacheKey();
 
         $this->plugin_data->$key = $author_object;
 
@@ -221,18 +221,18 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Set Article Cache
+     * Set Author Cache
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleCache()
+    protected function setAuthorCache()
     {
         if ($this->usePluginCache() === false) {
             return $this;
         }
 
-        $cache_key = $this->getArticleCacheKey();
+        $cache_key = $this->getAuthorCacheKey();
 
         $this->setPluginCache($cache_key, $this->plugin_data->$cache_key);
 
@@ -240,44 +240,44 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Set Article Profile Data into Primary Row
+     * Set Author Profile Data into Primary Row
      *
      * @param   array $model_registry
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleData(array $model_registry = array())
+    protected function setAuthorData(array $model_registry = array())
     {
-        $cache_key            = $this->getArticleCacheKey();
+        $cache_key            = $this->getAuthorCacheKey();
         $author_object        = $this->plugin_data->$cache_key;
         $this->row            = $author_object->row;
         $this->model_registry = $author_object->model_registry;
 
-        $this->setArticleModelRegistryFields($model_registry);
-        $this->setArticleModelRegistryCustomFields($model_registry);
+        $this->setAuthorModelRegistryFields($model_registry);
+        $this->setAuthorModelRegistryCustomFields($model_registry);
 
         return $this;
     }
 
     /**
-     * Get Article Cache Key
+     * Get Author Cache Key
      *
      * @return  string
      * @since   1.0.0
      */
-    protected function getArticleCacheKey()
+    protected function getAuthorCacheKey()
     {
-        return 'Article-' . (int)$this->author_id;
+        return 'Author-' . (int)$this->author_id;
     }
 
     /**
-     * Get Article Profile Query Object
+     * Get Author Profile Query Object
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleQuery()
+    protected function setAuthorQuery()
     {
         $this->setQueryController('Molajo//Model//Datasource//User.xml');
 
@@ -299,14 +299,14 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
     }
 
     /**
-     * Add Article Fields to Model Registry
+     * Add Author Fields to Model Registry
      *
      * @param   array $model_registry
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleModelRegistryFields(array $model_registry = array())
+    protected function setAuthorModelRegistryFields(array $model_registry = array())
     {
         $fields            = $model_registry['fields'];
         $customfieldgroups = $model_registry['customfieldgroups'];
@@ -320,20 +320,20 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
             }
         }
 
-        $this->setArticleFields('fields', $new_fields);
+        $this->setAuthorFields('fields', $new_fields);
 
         return $this;
     }
 
     /**
-     * Add Article Custom Fields to Model Registry
+     * Add Author Custom Fields to Model Registry
      *
      * @param   array $model_registry
      *
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleModelRegistryCustomFields(array $model_registry = array())
+    protected function setAuthorModelRegistryCustomFields(array $model_registry = array())
     {
         $customfieldgroups = $model_registry['customfieldgroups'];
 
@@ -342,14 +342,14 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
         }
 
         foreach ($customfieldgroups as $group) {
-            $this->setArticleFields($group, $model_registry[$group]);
+            $this->setAuthorFields($group, $model_registry[$group]);
         }
 
         return $this;
     }
 
     /**
-     * Process Article Fields by Group
+     * Process Author Fields by Group
      *
      * @param   string $source
      * @param   array  $fields
@@ -357,7 +357,7 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleFields($source, array $fields = array())
+    protected function setAuthorFields($source, array $fields = array())
     {
         if (count($fields) === 0) {
             return $this;
@@ -374,14 +374,14 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
                 $value = $this->row->$source->$name;
             }
 
-            $this->setArticleField($field, $value);
+            $this->setAuthorField($field, $value);
         }
 
         return $this;
     }
 
     /**
-     * Save Article Fields
+     * Save Author Fields
      *
      * @param   array $field
      * @param   mixed $value
@@ -389,7 +389,7 @@ final class ArticlePlugin extends ReadEvent implements ReadEventInterface, Displ
      * @return  $this
      * @since   1.0.0
      */
-    protected function setArticleField($field, $value)
+    protected function setAuthorField($field, $value)
     {
         $new_field           = $field;
         $new_field['name']   = 'author_' . $field['name'];
